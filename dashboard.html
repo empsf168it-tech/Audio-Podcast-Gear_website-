@@ -1,0 +1,893 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PODVOX | Studio Dashboard</title>
+    <link rel="icon" type="image/svg+xml" href="assets/images/favicon.svg" />
+    <link rel="stylesheet" href="assets/css/style.css" />
+    <style>
+        /* Dashboard Sidebar Desktop Height Fix */
+        .dashboard-sidebar {
+            background-color: var(--card-bg, #151521) !important;
+            color: rgba(245, 245, 247, 0.9) !important;
+            display: flex !important;
+            flex-direction: column !important;
+            min-height: 100vh !important;
+        }
+
+        @media (min-width: 1101px) {
+            .dashboard-layout {
+                display: grid !important;
+                grid-template-columns: 260px 1fr !important;
+                min-height: 100vh !important;
+                align-items: stretch !important;
+            }
+
+            .dashboard-sidebar {
+                position: sticky !important;
+                top: 0 !important;
+                height: 100vh !important;
+                z-index: 1000 !important;
+                overflow-y: auto !important;
+            }
+        }
+
+        .dashboard-sidebar .brand {
+            color: #f5f5f7 !important;
+            white-space: nowrap;
+            /* Prevent wrapping */
+            font-size: 1.1rem;
+            /* Reduced to fit in sidebar */
+        }
+
+        .sidebar-menu a {
+            color: rgba(245, 245, 247, 0.85) !important;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+            background-color: transparent !important;
+            padding: 12px 16px !important;
+            display: flex !important;
+            align-items: center !important;
+            gap: 12px !important;
+            text-decoration: none !important;
+            transition: all 0.3s ease !important;
+        }
+
+        .sidebar-menu a:hover {
+            background-color: rgba(124, 58, 237, 0.15) !important;
+            color: #f5f5f7 !important;
+        }
+
+        .sidebar-menu a.active {
+            background-color: var(--primary, #7C3AED) !important;
+            color: white !important;
+        }
+
+        .sidebar-menu .icon {
+            color: rgba(245, 245, 247, 0.9) !important;
+            font-size: 1.2rem !important;
+            width: 24px !important;
+            text-align: center !important;
+            display: inline-block !important;
+        }
+
+        .sidebar-menu a:hover .icon {
+            color: white !important;
+        }
+
+        .sidebar-menu a.active .icon {
+            color: white !important;
+        }
+
+        .close-sidebar {
+            color: white !important;
+            background: none !important;
+            border: none !important;
+            font-size: 1.5rem !important;
+            cursor: pointer !important;
+            padding: 8px !important;
+        }
+
+        .close-sidebar:hover {
+            color: #F59E0B !important;
+        }
+
+        /* Force visibility in all themes */
+        body.light-theme .dashboard-sidebar,
+        body:not(.dark-theme) .dashboard-sidebar {
+            background-color: #151521 !important;
+        }
+
+        body.light-theme .sidebar-menu a,
+        body:not(.dark-theme) .sidebar-menu a {
+            color: rgba(245, 245, 247, 0.85) !important;
+        }
+
+        body.light-theme .sidebar-menu .icon,
+        body:not(.dark-theme) .sidebar-menu .icon {
+            color: rgba(245, 245, 247, 0.9) !important;
+        }
+
+        /* Modern Dashboard Styles */
+        .dashboard-welcome {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 32px;
+            padding: 24px;
+            background: var(--card);
+            border-radius: 16px;
+            box-shadow: var(--shadow);
+        }
+
+        .welcome-left h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: var(--ink);
+        }
+
+        .welcome-left p {
+            color: var(--muted);
+            margin: 0;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .user-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .user-details {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .user-name {
+            font-weight: 600;
+            color: var(--ink);
+        }
+
+        .user-role {
+            font-size: 0.85rem;
+            color: var(--muted);
+        }
+
+        .stats-grid-modern {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 32px;
+        }
+
+        .stat-card-modern {
+            background: var(--card);
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: var(--shadow);
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .stat-card-modern:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .stat-icon {
+            width: 48px;
+            height: 48px;
+            background: var(--primary);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            flex-shrink: 0;
+        }
+
+        .stat-content {
+            flex: 1;
+        }
+
+        .stat-value {
+            display: block;
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--ink);
+            margin-bottom: 4px;
+        }
+
+        .stat-label {
+            display: block;
+            font-size: 0.9rem;
+            color: var(--muted);
+            margin-bottom: 4px;
+        }
+
+        .stat-change {
+            display: inline-block;
+            font-size: 0.8rem;
+            font-weight: 600;
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+
+        .stat-change.positive {
+            background: rgba(124, 58, 237, 0.15);
+            color: var(--primary);
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            margin-bottom: 32px;
+        }
+
+        .dashboard-card {
+            background: var(--card);
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: var(--shadow);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .card-header h3 {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--ink);
+        }
+
+        .view-all {
+            color: var(--primary);
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .view-all:hover {
+            text-decoration: underline;
+        }
+
+        .episodes-list {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .episode-item {
+            display: flex;
+            gap: 16px;
+            padding: 16px;
+            border-radius: 12px;
+            transition: background-color 0.3s ease;
+        }
+
+        .episode-item:hover {
+            background-color: var(--background);
+        }
+
+        .episode-cover {
+            width: 60px;
+            height: 60px;
+            border-radius: 8px;
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+
+        .episode-cover img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .episode-info {
+            flex: 1;
+        }
+
+        .episode-info h4 {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--ink);
+            margin-bottom: 8px;
+        }
+
+        .episode-meta {
+            display: flex;
+            gap: 12px;
+            font-size: 0.8rem;
+            color: var(--muted);
+            margin-bottom: 8px;
+        }
+
+        .episode-stats {
+            display: flex;
+            gap: 16px;
+            font-size: 0.8rem;
+            color: var(--muted);
+        }
+
+        .period-selector {
+            padding: 8px 12px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background: var(--card);
+            color: var(--ink);
+            font-size: 0.9rem;
+        }
+
+        .chart-container {
+            margin-bottom: 20px;
+        }
+
+        .chart-placeholder {
+            padding: 20px;
+            background: var(--background);
+            border-radius: 12px;
+        }
+
+        .chart-bars {
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-between;
+            height: 120px;
+            margin-bottom: 12px;
+        }
+
+        .bar {
+            width: 30px;
+            background: var(--primary);
+            border-radius: 4px 4px 0 0;
+            transition: height 0.3s ease;
+        }
+
+        .bar:hover {
+            opacity: 0.8;
+        }
+
+        .chart-labels {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.8rem;
+            color: var(--muted);
+        }
+
+        .chart-summary {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .summary-item {
+            text-align: center;
+        }
+
+        .summary-label {
+            display: block;
+            font-size: 0.8rem;
+            color: var(--muted);
+            margin-bottom: 4px;
+        }
+
+        .summary-value {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--ink);
+        }
+
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .action-card {
+            background: var(--card);
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: var(--shadow);
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            transition: transform 0.3s ease;
+        }
+
+        .action-card:hover {
+            transform: translateY(-2px);
+        }
+
+        .action-icon {
+            width: 48px;
+            height: 48px;
+            background: var(--background);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary);
+            flex-shrink: 0;
+        }
+
+        .action-content {
+            flex: 1;
+        }
+
+        .action-content h4 {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--ink);
+            margin-bottom: 4px;
+        }
+
+        .action-content p {
+            font-size: 0.85rem;
+            color: var(--muted);
+            margin: 0 0 12px 0;
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 900px) {
+            .dashboard-welcome {
+                flex-direction: column;
+                gap: 16px;
+                text-align: center;
+            }
+
+            .stats-grid-modern {
+                grid-template-columns: 1fr;
+            }
+
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .quick-actions {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Mobile Dashboard Specifics */
+        @media (max-width: 900px) {
+
+            /* Toggle Button Visibility & Layering */
+            .dashboard-toggle-btn {
+                display: inline-flex !important;
+                align-items: center;
+                justify-content: center;
+                position: relative;
+                z-index: 10001;
+                background: var(--primary);
+                border: none;
+                cursor: pointer;
+                padding: 0;
+                width: 40px;
+                height: 40px;
+                color: #fff;
+                border-radius: 8px;
+                margin-right: 0;
+                flex-shrink: 0;
+            }
+
+            /* Ensure Sidebar is strictly dark and on top */
+            .dashboard-sidebar {
+                z-index: 10000;
+                background-color: #151521 !important;
+                width: min(300px, 85vw);
+            }
+
+            /* Sidebar Typography */
+            .sidebar-menu a {
+                color: rgba(245, 245, 247, 0.85) !important;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+                display: flex;
+                align-items: center;
+                gap: 12px;
+            }
+
+            .sidebar-menu .icon {
+                display: inline-block;
+                width: 24px;
+                text-align: center;
+                font-size: 1.2rem;
+            }
+        }
+
+        /* Overlay - Essential Logic */
+        .dashboard-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            z-index: 9999;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .dashboard-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="dashboard-layout">
+        <!-- Sidebar -->
+        <aside class="dashboard-sidebar">
+            <div class="sidebar-header">
+                <a class="brand" href="index.html">
+                    <span class="brand-mark" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="9" y="2" width="6" height="11" rx="3" fill="rgba(255,255,255,0.25)"></rect>
+                            <path d="M5 10v1a7 7 0 0 0 14 0v-1"></path>
+                            <line x1="12" y1="18" x2="12" y2="22"></line>
+                            <line x1="8" y1="22" x2="16" y2="22"></line>
+                        </svg>
+                    </span>
+                    <span class="brand-text">PODVOX</span>
+                </a>
+                <button class="close-sidebar" aria-label="Close menu">&times;</button>
+            </div>
+            <nav class="sidebar-menu">
+                <a href="#" class="active">
+                    <span class="icon">🎛️</span> Studio Console
+                </a>
+                <a href="#">
+                    <span class="icon">🎙️</span> Hardware Rigs
+                </a>
+                <a href="#">
+                    <span class="icon">📊</span> Audio Telemetry
+                </a>
+                <a href="#">
+                    <span class="icon">🛡️</span> Warranty &amp; Drivers
+                </a>
+                <a href="#">
+                    <span class="icon">🎧</span> Monitoring Presets
+                </a>
+                <a href="#">
+                    <span class="icon">⚙️</span> Device Settings
+                </a>
+                <a href="index.html" class="logout">
+                    <span class="icon">🚪</span> Logout
+                </a>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="dashboard-main">
+
+
+            <header id="top">
+                <div class="container nav nav-dashboard">
+                    <div class="nav-actions">
+                        <div class="user-profile">
+                            <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=64&h=64"
+                                alt="User" />
+                        </div>
+                        <button class="theme-toggle" type="button" aria-label="Toggle dark mode"></button>
+                        <button class="menu-toggle dashboard-toggle-btn" type="button" aria-label="Open Dashboard Menu">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <line x1="3" y1="12" x2="21" y2="12"></line>
+                                <line x1="3" y1="6" x2="21" y2="6"></line>
+                                <line x1="3" y1="18" x2="21" y2="18"></line>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </header>
+
+            <div class="dashboard-content">
+                <!-- Welcome Header -->
+                <div class="dashboard-welcome">
+                    <div class="welcome-left">
+                        <h1>Studio Console Overview</h1>
+                        <p>Manage your connected microphones, preamps, DSP profiles, and studio hardware</p>
+                    </div>
+                    <div class="welcome-right">
+                        <div class="user-info">
+                            <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=64&h=64"
+                                alt="User" class="user-avatar" />
+                            <div class="user-details">
+                                <span class="user-name">Marcus Vance</span>
+                                <span class="user-role">Studio Pro Engineer</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Stats -->
+                <div class="stats-grid-modern">
+                    <div class="stat-card-modern">
+                        <div class="stat-icon">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"></path>
+                                <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+                                <line x1="12" y1="19" x2="12" y2="23"></line>
+                                <line x1="8" y1="23" x2="16" y2="23"></line>
+                            </svg>
+                        </div>
+                        <div class="stat-content">
+                            <span class="stat-value">6 Active</span>
+                            <span class="stat-label">Hardware Devices</span>
+                            <span class="stat-change positive">All Online</span>
+                        </div>
+                    </div>
+                    <div class="stat-card-modern">
+                        <div class="stat-icon">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                                <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                            </svg>
+                        </div>
+                        <div class="stat-content">
+                            <span class="stat-value">-128 dBu</span>
+                            <span class="stat-label">Preamp Noise Floor</span>
+                            <span class="stat-change positive">Ultra-Clean</span>
+                        </div>
+                    </div>
+                    <div class="stat-card-modern">
+                        <div class="stat-icon">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <polygon
+                                    points="12 2 15.09 8.26 22 9 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9 8.9 2 12 2z">
+                                </polygon>
+                            </svg>
+                        </div>
+                        <div class="stat-content">
+                            <span class="stat-value">24-bit/192k</span>
+                            <span class="stat-label">Master Resolution</span>
+                            <span class="stat-change">Lock Synced</span>
+                        </div>
+                    </div>
+                    <div class="stat-card-modern">
+                        <div class="stat-icon">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                            </svg>
+                        </div>
+                        <div class="stat-content">
+                            <span class="stat-value">3 Years</span>
+                            <span class="stat-label">Pro Care Warranty</span>
+                            <span class="stat-change positive">Active Cover</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Main Dashboard Grid -->
+                <div class="dashboard-grid">
+                    <!-- Connected Hardware -->
+                    <div class="dashboard-card">
+                        <div class="card-header">
+                            <h3>Connected Studio Hardware</h3>
+                            <a href="#" class="view-all">Manage All</a>
+                        </div>
+                        <div class="episodes-list">
+                            <div class="episode-item">
+                                <div class="episode-cover">
+                                    <img src="https://images.unsplash.com/photo-1590602847861-f357a9332bbc?auto=format&fit=crop&w=100&q=80"
+                                        alt="Studio Pro XLR Mic" />
+                                </div>
+                                <div class="episode-info">
+                                    <h4>Studio Pro XLR Dynamic Mic</h4>
+                                    <div class="episode-meta">
+                                        <span>Channel 1</span>
+                                        <span>+48dB Clean Gain</span>
+                                        <span>Firmware v2.4</span>
+                                    </div>
+                                    <div class="episode-stats">
+                                        <span>🎚️ 0dB Peak</span>
+                                        <span>🎛️ Low Cut ON</span>
+                                        <span>🎙️ Cardioid</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="episode-item">
+                                <div class="episode-cover">
+                                    <img src="https://images.unsplash.com/photo-1478737270239-2f02b77fc618?auto=format&fit=crop&w=100&q=80"
+                                        alt="Ultra-HDDA Audio Interface" />
+                                </div>
+                                <div class="episode-info">
+                                    <h4>APG-4 Quad XLR Audio Interface</h4>
+                                    <div class="episode-meta">
+                                        <span>USB-C Connected</span>
+                                        <span>96kHz / 24-bit</span>
+                                        <span>ASIO Driver Ready</span>
+                                    </div>
+                                    <div class="episode-stats">
+                                        <span>⚡ 48V Active</span>
+                                        <span>🎧 Headphone 1 &amp; 2</span>
+                                        <span>🔊 Monitors Out</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="episode-item">
+                                <div class="episode-cover">
+                                    <img src="https://images.unsplash.com/photo-1546435770-a3e426bf472b?auto=format&fit=crop&w=100&q=80"
+                                        alt="Studio Monitoring Headphones" />
+                                </div>
+                                <div class="episode-info">
+                                    <h4>APG Studio Reference Cans</h4>
+                                    <div class="episode-meta">
+                                        <span>Closed-Back</span>
+                                        <span>80 Ohm Driver</span>
+                                        <span>Calibrated Curve</span>
+                                    </div>
+                                    <div class="episode-stats">
+                                        <span>🎚️ Output 1</span>
+                                        <span>🔊 Flat EQ</span>
+                                        <span>🔇 Zero Leakage</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Performance Chart -->
+                    <div class="dashboard-card">
+                        <div class="card-header">
+                            <h3>Acoustic &amp; Gain Telemetry</h3>
+                            <select class="period-selector">
+                                <option>Live Session</option>
+                                <option>Past 24 Hours</option>
+                                <option>Weekly Recording Logs</option>
+                            </select>
+                        </div>
+                        <div class="chart-container">
+                            <div class="chart-placeholder">
+                                <div class="chart-bars">
+                                    <div class="bar" style="height: 60%"></div>
+                                    <div class="bar" style="height: 80%"></div>
+                                    <div class="bar" style="height: 45%"></div>
+                                    <div class="bar" style="height: 90%"></div>
+                                    <div class="bar" style="height: 70%"></div>
+                                    <div class="bar" style="height: 85%"></div>
+                                    <div class="bar" style="height: 95%"></div>
+                                </div>
+                                <div class="chart-labels">
+                                    <span>50Hz</span>
+                                    <span>200Hz</span>
+                                    <span>1kHz</span>
+                                    <span>3.5kHz</span>
+                                    <span>8kHz</span>
+                                    <span>12kHz</span>
+                                    <span>18kHz</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="chart-summary">
+                            <div class="summary-item">
+                                <span class="summary-label">Average Vocal Clarity</span>
+                                <span class="summary-value">+3.2 dB Presence</span>
+                            </div>
+                            <div class="summary-item">
+                                <span class="summary-label">Room Reverb RT60</span>
+                                <span class="summary-value">0.18s (Treated)</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="quick-actions">
+                    <div class="action-card">
+                        <div class="action-icon">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <line x1="12" y1="8" x2="12" y2="16"></line>
+                                <line x1="8" y1="12" x2="16" y2="12"></line>
+                            </svg>
+                        </div>
+                        <div class="action-content">
+                            <h4>Calibrate Mic Capsule</h4>
+                            <p>Run auto-gain calibration and acoustic test</p>
+                        </div>
+                        <button class="btn btn-primary">Calibrate</button>
+                    </div>
+                    <div class="action-card">
+                        <div class="action-icon">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                            </svg>
+                        </div>
+                        <div class="action-content">
+                            <h4>DSP Vocal Presets</h4>
+                            <p>Tweak compression, high-pass filter, and de-esser</p>
+                        </div>
+                        <button class="btn btn-outline">Edit DSP</button>
+                    </div>
+                    <div class="action-card">
+                        <div class="action-icon">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <path d="M12 2L2 7v10c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-10-5z"></path>
+                            </svg>
+                        </div>
+                        <div class="action-content">
+                            <h4>Firmware &amp; Drivers</h4>
+                            <p>Check for low-latency driver &amp; console updates</p>
+                        </div>
+                        <button class="btn btn-outline">Check Updates</button>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Overlay -->
+        <div class="dashboard-overlay"></div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="assets/js/main.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const dashToggle = document.querySelector('.dashboard-toggle-btn');
+            const sidebar = document.querySelector('.dashboard-sidebar');
+            const overlay = document.querySelector('.dashboard-overlay');
+            const closeSidebar = document.querySelector('.close-sidebar');
+
+            // Explicit Open/Close Functions
+            function toggleMenu(e) {
+                if (e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                }
+                const isOpen = sidebar.classList.contains('open');
+                if (isOpen) {
+                    closeMenu();
+                } else {
+                    openMenu();
+                }
+            }
+
+            function openMenu() {
+                sidebar.classList.add('open');
+                overlay.classList.add('active');
+            }
+
+            function closeMenu() {
+                sidebar.classList.remove('open');
+                overlay.classList.remove('active');
+            }
+
+            // Event Listeners
+            if (dashToggle) dashToggle.addEventListener('click', toggleMenu);
+            if (closeSidebar) closeSidebar.addEventListener('click', closeMenu);
+            if (overlay) overlay.addEventListener('click', closeMenu);
+
+            // Close on Escape
+            document.addEventListener('keydown', function (e) {
+                if (e.key === 'Escape' && sidebar.classList.contains('open')) {
+                    closeMenu();
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>

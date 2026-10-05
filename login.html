@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PODVOX | Creator Portal Login</title>
+  <link rel="icon" type="image/svg+xml" href="assets/images/favicon.svg" />
+  <link rel="stylesheet" href="assets/css/style.css" />
+</head>
+
+<body class="auth-page">
+
+
+  <header id="top">
+    <div class="container nav nav-auth-header">
+      <div class="nav-actions">
+        <button class="theme-toggle" type="button" aria-label="Toggle dark mode"></button>
+      </div>
+    </div>
+  </header>
+  <main class="auth-shell">
+    <div class="auth-center">
+      <div class="auth-card compact">
+        <div class="auth-brand-in-card">
+          <a class="brand" href="index.html">
+            <span class="brand-mark" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="9" y="2" width="6" height="11" rx="3" fill="rgba(255,255,255,0.25)"></rect>
+                <path d="M5 10v1a7 7 0 0 0 14 0v-1"></path>
+                <line x1="12" y1="18" x2="12" y2="22"></line>
+                <line x1="8" y1="22" x2="16" y2="22"></line>
+              </svg>
+            </span>
+            <span class="brand-text">PODVOX</span>
+          </a>
+        </div>
+        <h1>Studio Login</h1>
+        <p>Access your hardware orders, warranty claims, and driver downloads.</p>
+        <form class="auth-form">
+          <label for="login-email">Email</label>
+          <input id="login-email" type="email" name="email" autocomplete="email" placeholder="you@example.com"
+            required />
+          <label for="login-password">Password</label>
+          <input id="login-password" type="password" name="password" autocomplete="current-password"
+            placeholder="Enter your password" required />
+          <div class="auth-options">
+            <label class="checkbox-label">
+              <input type="checkbox" name="remember" id="remember-me">
+              <span class="checkmark"></span>
+              Remember me
+            </label>
+            <a href="#" class="forgot-password">Forgot password?</a>
+          </div>
+          <button class="btn btn-primary" type="submit">Login to Studio</button>
+        </form>
+        <div class="divider"><span>OR</span></div>
+        <div class="social">
+          <button class="btn btn-outline" type="button">Login with Google</button>
+          <button class="btn btn-outline" type="button">Login with GitHub</button>
+        </div>
+        <p class="auth-switch">New creator? <a href="signup.html">Create account</a></p>
+      </div>
+    </div>
+  </main>
+
+
+
+
+  <script src="assets/js/main.js"></script>
+</body>
+
+</html>
