@@ -681,6 +681,29 @@ document.addEventListener("DOMContentLoaded", () => {
   const closeNavBtn = document.querySelector(".close-nav-toggle");
 
   if (navLinks) {
+    // Ensure CTA button exists inside drawer for mobile/tablet
+    if (!navLinks.querySelector(".nav-drawer-cta")) {
+      const headerBtn = document.querySelector(".nav-actions .btn");
+      if (headerBtn) {
+        const ctaWrap = document.createElement("div");
+        ctaWrap.className = "nav-drawer-cta";
+        const clonedBtn = headerBtn.cloneNode(true);
+        clonedBtn.classList.remove("desktop-only");
+        clonedBtn.classList.add("btn-drawer");
+        ctaWrap.appendChild(clonedBtn);
+        navLinks.appendChild(ctaWrap);
+      }
+    }
+
+    // Ensure active state on current page link
+    const currentPath = window.location.pathname.split("/").pop() || "index.html";
+    navLinks.querySelectorAll("a:not(.btn-drawer)").forEach((link) => {
+      const href = link.getAttribute("href");
+      if (href && (href === currentPath || (currentPath === "" && href === "index.html"))) {
+        link.classList.add("active");
+      }
+    });
+
     menuToggles.forEach(toggle => {
       toggle.addEventListener("click", (e) => {
         e.stopPropagation();
@@ -697,6 +720,11 @@ document.addEventListener("DOMContentLoaded", () => {
     if (closeNavBtn) {
       closeNavBtn.addEventListener("click", closeMenu);
     }
+
+    // Close when drawer links are clicked
+    navLinks.querySelectorAll("a").forEach(link => {
+      link.addEventListener("click", closeMenu);
+    });
 
     // Click outside to close menu
     document.addEventListener("click", (e) => {
@@ -744,3 +772,63 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 });
+
+// Top to bottom floating button (visible in all sections on all pages)
+const initTopToBottomButton = () => {
+  let btn = document.getElementById("topToBottomBtn");
+  if (!btn) {
+    btn = document.createElement("button");
+    btn.id = "topToBottomBtn";
+    btn.className = "top-to-bottom-btn";
+    btn.type = "button";
+    btn.setAttribute("aria-label", "Top to bottom");
+    btn.setAttribute("title", "Top to bottom");
+    btn.innerHTML = `
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <line x1="12" y1="4" x2="12" y2="20"></line>
+        <polyline points="19 13 12 20 5 13"></polyline>
+      </svg>
+    `;
+    document.body.appendChild(btn);
+  }
+
+  const updateScrollState = () => {
+    const scrollHeight = document.documentElement.scrollHeight;
+    const clientHeight = window.innerHeight;
+    const scrollTop = window.scrollY || document.documentElement.scrollTop;
+    const isAtBottom = (scrollTop + clientHeight) >= (scrollHeight - 60);
+
+    if (isAtBottom) {
+      btn.classList.add("at-bottom");
+      btn.setAttribute("aria-label", "Scroll to top");
+      btn.setAttribute("title", "Scroll to top");
+    } else {
+      btn.classList.remove("at-bottom");
+      btn.setAttribute("aria-label", "Top to bottom");
+      btn.setAttribute("title", "Top to bottom");
+    }
+  };
+
+  btn.addEventListener("click", () => {
+    const scrollHeight = document.documentElement.scrollHeight;
+    const clientHeight = window.innerHeight;
+    const scrollTop = window.scrollY || document.documentElement.scrollTop;
+    const isAtBottom = (scrollTop + clientHeight) >= (scrollHeight - 60);
+
+    if (isAtBottom) {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    } else {
+      window.scrollTo({ top: scrollHeight, behavior: "smooth" });
+    }
+  });
+
+  window.addEventListener("scroll", updateScrollState, { passive: true });
+  updateScrollState();
+};
+
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", initTopToBottomButton);
+} else {
+  initTopToBottomButton();
+}
+
